@@ -7,20 +7,22 @@
 > Multi-agent autonomous academic research pipeline — 12 AI agents collaborate from literature review to paper submission.
 
 ![Python 3.12](https://img.shields.io/badge/Python-3.12+-3776AB)
-![Tests](https://img.shields.io/badge/Tests-224_passing-success)
+![Tests](https://img.shields.io/badge/Tests-269_passing-success)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
-![Agents](https://img.shields.io/badge/Agents-12-blueviolet)
+![Agents](https://img.shields.io/badge/Agents-21-blueviolet)
 ![Pipeline](https://img.shields.io/badge/Pipeline-Phase_0–5-ff6b6b)
 
 ---
 
 ## ✨ Highlights
 
-- **🧠 12 specialized agents** — research director, literature researcher, method reviewer, paper writer, and more
+- **🧠 21 specialized agents** — 12 original + 9 new specialists (statistical-reviewer, fact-checker, ethics-reviewer, and more)
 - **🔄 Phase 0–5 automation** — environment init → literature review → method design → experiment → coding → paper writing
-- **🔍 7 LLM-powered review gates** — novelty, methodology, experiment audit, citation audit — automatic quality checks per phase
-- **🎯 Three-model routing** — AGENT\_TIER dispatches skills to Executor/Reviewer/Pro models based on task complexity
+- **🔍 7 LLM-powered review gates** — critical gates (G2/G5/G7) use **dual-model Fusion voting** for higher reliability
+- **🎯 Three-model routing w/ ComplexityRouter** — AGENT\_TIER dispatches by task; ComplexityRouter dynamically adjusts iteration budgets based on task complexity
+- **💰 CostLedger + TokenBudget** — Redis append-only cost ledger with snapshotMax reconciliation; 3-layer token budget with auto-degrade chain (large→medium→small)
 - **🛡️ SkillContract runtime protection** — gray-release observation mode + blocking mode to guard the pipeline
+- **💬 Telegram Interview** — before launching the pipeline, assesses task clarity and asks clarifying questions via InlineKeyboard
 - **📡 Remote control via Telegram** — launch pipelines, check progress, receive results from anywhere
 - **🏭 Production-grade systemd deployment** — 4 systemd services with auto-restart
 
@@ -86,7 +88,7 @@ cd redis-memory && pytest tests/ -v --tb=short
 
 ---
 
-## 🧑‍🔬 12 Agents
+## 🧑‍🔬 21 Agents
 
 | Layer | Agent | Core Capability |
 |-------|-------|-----------------|
@@ -102,6 +104,15 @@ cd redis-memory && pytest tests/ -v --tb=short
 | **Review** | Method Reviewer | Proof checking, adversarial review |
 | | Academic Reviewer | Experiment audit, claim verification |
 | | Citation Auditor | BibTeX verification, context check |
+| | Statistical Reviewer | Statistical method audit, p-hacking detection |
+| | Math Checker | Derivation verification, dimensional consistency |
+| | Reproducibility Auditor | Seed/version/environment rerun checks |
+| | Data Validator | Dataset quality profiling |
+| | Fact Checker | Scientific claim verification against sources |
+| | Protocol Writer | Experimental SOP/protocol drafting |
+| | Results Interpreter | Result analysis, alternative explanations |
+| **Writing** | Abstract Writer | Abstracts, summaries, lay explanations |
+| | Ethics Reviewer | Research ethics, dual-use, privacy review |
 
 Each agent is routed to the appropriate LLM tier via AGENT\_TIER: simple retrieval → Reviewer (glm-5.2), routine execution → Executor (deepseek-v4-flash), complex reasoning → Pro (deepseek-v4-pro).
 
@@ -125,13 +136,23 @@ Covers 30+ skills: training/charting → Executor, literature search → Reviewe
 Phase 0 ──→ Phase 1 ──→ Phase 2 ──→ Phase 3 ──→ Phase 4 ──→ Phase 5
  Init       Literature   Method     Experiment  Coding      Paper
  Setup      Review       Design     Validation  Writing     Submission
-               │             │           │         │
-            Gate 1       Gate 2       Gate 3    Gates 4+5   Gates 6+7
-          Novelty      Method       Experiment  Claim +     Final Review
-          Check        Adversarial  Audit       Citation    + Citation
-```
+                │             │           │         │
+             Gate 1       Gate 2       Gate 3    Gates 4+5   Gates 6+7
+           Novelty      Method ★     Experiment  Claim +     Final Review ★
+           Check        Adversarial  Audit       Citation    + Citation ★
+                         ★ = Fusion voting (reviewer + pro dual-model panel)
 
 ---
+
+## 💰 TokenBudget & CostLedger
+
+| Feature | Mechanism | Details |
+|---------|-----------|---------|
+| **3-Layer Token Budget** | Call / Session / Task | Session: 500K, Task: 5M tokens. Auto-degrade large→medium→small |
+| **CostLedger** | Redis append-only | `costs:{project}:{session}` List + `INCRBYFLOAT` project total |
+| **snapshotMax** | Dual-measurement reconciliation | Max of stats-delta and turn-end tally prevents undercounting |
+| **Agent/Subagent split** | Role-tagged entries | Separate `agent_usd` and `subagent_usd` in per-session summaries |
+| **Budget enforcement** | O(1) check | `is_budget_exceeded()` reads running total, blocks at 100% |
 
 ## 🛡️ SkillContract Security Layers
 
@@ -167,13 +188,15 @@ curl http://127.0.0.1:9333/health
 
 ```
 PolyAgent-Research/
-├── redis-memory/         # Core modules (50+ files)
+├── redis-memory/         # Core modules (55+ files)
 │   ├── academic_loop.py  # Pipeline orchestrator
+│   ├── agent_roster.py   # 21 expert definitions
+│   ├── cost_ledger.py    # Append-only cost ledger
 │   ├── llm_client.py     # Three-model client
-│   ├── gate_judge.py     # 7 LLM review gates
+│   ├── gate_judge.py     # 7 LLM review gates + Fusion voting
 │   ├── skill_contract.py # Runtime safety layer
 │   ├── fault_catalog.py  # 27 fault patterns
-│   └── tests/            # 224 tests
+│   └── tests/            # 269 tests
 ├── telegram_bridge/      # Telegram bridge
 ├── systemd/              # 4 systemd services
 ├── skills/               # Skill definitions
@@ -195,8 +218,12 @@ PolyAgent-Research/
 | Summary & persistence | 25 |
 | Tool budget & heartbeat | 20 |
 | Fault / Adversarial | 12 |
+| Cost ledger & TokenBudget | 14 |
+| Agent roster & fusion | 15 |
+| Complexity router & loop init | 14 |
+| Interview clarity | 10 |
 | LLM integration (slow) | 11 |
-| **Total** | **224** |
+| **Total** | **269** |
 
 ---
 
@@ -208,6 +235,7 @@ PolyAgent-Research/
 | **Shannon** | [github.com/Kocoro-lab/Shannon](https://github.com/Kocoro-lab/Shannon) | Multi-agent framework powering the three-model architecture and AGENT_TIER routing |
 | **Scientific Agent Skills** | [github.com/K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) | 147 open-source scientific skills referenced for academic research workflows |
 | **ARIS** | [github.com/wanshuiyin/Auto-claude-code-research-in-sleep](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep) | Multi-agent autonomous research system — language switch pattern, project structure, and workflow design reference |
+| **K-Dense BYOK** | [github.com/K-Dense-AI/k-dense-byok](https://github.com/K-Dense-AI/k-dense-byok) | Open-source research assistant — inspired Fusion voting, CostLedger snapshotMax, Interview clarification, and the 21-specialist agent model |
 
 ---
 

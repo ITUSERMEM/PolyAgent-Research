@@ -7,20 +7,22 @@
 > 多智能体自动化科研管线 — 12 个 AI 智能体协同完成从文献调研到论文投稿的全流程。
 
 ![Python 3.12](https://img.shields.io/badge/Python-3.12+-3776AB)
-![Tests](https://img.shields.io/badge/Tests-224_passing-success)
+![Tests](https://img.shields.io/badge/Tests-269_passing-success)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
-![Agents](https://img.shields.io/badge/Agents-12-blueviolet)
+![Agents](https://img.shields.io/badge/Agents-21-blueviolet)
 ![Pipeline](https://img.shields.io/badge/Pipeline-Phase_0–5-ff6b6b)
 
 ---
 
 ## ✨ 亮点
 
-- **🧠 12 个领域智能体** — 研究总监、文献研究员、方法评审、论文写手等角色各司其职
+- **🧠 21 个领域智能体** — 原 12 个 + 新增 9 个专家（统计评审、事实核查、伦理审查等）
 - **🔄 Phase 0–5 全自动管线** — 环境初始化 → 文献调研 → 方案设计 → 实验验证 → 代码实现 → 论文撰写
-- **🔍 7 道 LLM 评审门禁** — 新颖性、方法论、实验审计、引用审计，每个阶段自动质检
-- **🎯 三模型路由** — AGENT\_TIER 根据 skill 类型自动分配 Executor/Reviewer/Pro 模型，不是用一个 flash 干所有活
+- **🔍 7 道 LLM 评审门禁** — 关键门禁（G2/G5/G7）启用 **双模型 Fusion 投票**，大幅提升判断可靠性
+- **🎯 三模型路由 + ComplexityRouter** — AGENT\_TIER 分配合适模型；ComplexityRouter 根据任务复杂度动态调整迭代预算
+- **💰 CostLedger + TokenBudget** — Redis 追加式成本账本 + snapshotMax 对账；三层 token 预算自动降级（large→medium→small）
 - **🛡️ SkillContract 运行时保护** — 灰度发布 + 阻断模式，防止非法输入进入管线
+- **💬 Telegram 交互式澄清** — 启动管线前评估任务清晰度，通过 InlineKeyboard 发起追问
 - **📡 Telegram 远程操控** — 随时随地启动管线、查看进度、接收结果
 - **🏭 Systemd 生产部署** — 4 个 systemd 服务，开机自启，自动恢复
 
@@ -86,7 +88,7 @@ cd redis-memory && pytest tests/ -v --tb=short
 
 ---
 
-## 🧑‍🔬 12 个智能体
+## 🧑‍🔬 21 个智能体
 
 | 层级 | 智能体 | 核心能力 |
 |------|--------|---------|
@@ -102,6 +104,15 @@ cd redis-memory && pytest tests/ -v --tb=short
 | **评审** | 方法评审员 | 证明检查、对抗性评审 |
 | | 学术评审员 | 实验审计、Claim 验证 |
 | | 引用审计员 | BibTeX 验证、上下文检查 |
+| | 统计评审员 | 统计方法审计、p-hacking 检测 |
+| | 数学检验员 | 公式推导验证、量纲一致性 |
+| | 可复现性审计员 | 种子/版本/环境复现检查 |
+| | 数据验证员 | 数据集质量分析 |
+| | 事实核查员 | 科学声明溯源验证 |
+| | 协议编写员 | 实验 SOP/协议编写 |
+| | 结果解读者 | 结果分析、替代假说 |
+| **写作** | 摘要写手 | 摘要、总结、通俗解释 |
+| | 伦理审查员 | 研究伦理、双用风险、隐私审查 |
 
 每个智能体通过 AGENT\_TIER 自动分配到适合的 LLM 层级：简单检索 → Reviewer（glm-5.2），常规执行 → Executor（deepseek-v4-flash），复杂推理 → Pro（deepseek-v4-pro）。
 
@@ -125,13 +136,23 @@ cd redis-memory && pytest tests/ -v --tb=short
 Phase 0 ──→ Phase 1 ──→ Phase 2 ──→ Phase 3 ──→ Phase 4 ──→ Phase 5
  Init       Literature   Method     Experiment  Coding      Paper
  Setup      Review       Design     Validation  Writing     Submission
-               │             │           │         │
-            Gate 1       Gate 2       Gate 3    Gates 4+5   Gates 6+7
-          Novelty      Method       Experiment  Claim +     Final Review
-          Check        Adversarial  Audit       Citation    + Citation
-```
+                │             │           │         │
+             Gate 1       Gate 2       Gate 3    Gates 4+5   Gates 6+7
+           Novelty      Method ★     Experiment  Claim +     Final Review ★
+           Check        Adversarial  Audit       Citation    + Citation ★
+                         ★ = Fusion 投票（reviewer + pro 双模型 Panel）
 
 ---
+
+## 💰 TokenBudget & CostLedger
+
+| 特性 | 机制 | 说明 |
+|------|------|------|
+| **三层 Token 预算** | Call / Session / Task | Session: 50 万，Task: 500 万 token。自动降级 large→medium→small |
+| **CostLedger** | Redis 追加式账本 | `costs:{project}:{session}` List + `INCRBYFLOAT` 项目总计 |
+| **snapshotMax** | 双测量对账 | stats-delta 与 turn-end tally 取最大值，防止漏记 |
+| **Agent/Subagent 分离** | 角色标记 | 每次记录区分 agent_usd 和 subagent_usd |
+| **预算强制** | O(1) 检查 | `is_budget_exceeded()` 读取运行总计，100% 时阻断 |
 
 ## 🛡️ SkillContract 安全层
 
@@ -167,13 +188,15 @@ curl http://127.0.0.1:9333/health
 
 ```
 PolyAgent-Research/
-├── redis-memory/         # 核心模块（50+ 文件）
+├── redis-memory/         # 核心模块（55+ 文件）
 │   ├── academic_loop.py  # 管线编排器
+│   ├── agent_roster.py   # 21 专家定义
+│   ├── cost_ledger.py    # 追加式成本账本
 │   ├── llm_client.py     # 三模型客户端
-│   ├── gate_judge.py     # 7 门 LLM 评审
+│   ├── gate_judge.py     # 7 门 LLM 评审 + Fusion 投票
 │   ├── skill_contract.py # 运行时安全层
 │   ├── fault_catalog.py  # 27 故障模式
-│   └── tests/            # 224 项测试
+│   └── tests/            # 269 项测试
 ├── telegram_bridge/      # Telegram 桥接
 ├── systemd/              # 4 个 Systemd 服务
 ├── skills/               # 技能文件
@@ -194,8 +217,12 @@ PolyAgent-Research/
 | 摘要与持久化 | 25 |
 | 工具预算与心跳 | 20 |
 | 故障与对抗测试 | 12 |
+| CostLedger & TokenBudget | 14 |
+| Agent Roster & Fusion | 15 |
+| ComplexityRouter & Loop Init | 14 |
+| Interview 澄清 | 10 |
 | LLM 集成（慢） | 11 |
-| **合计** | **224** |
+| **合计** | **269** |
 
 ---
 
@@ -207,6 +234,7 @@ PolyAgent-Research/
 | **Shannon** | [github.com/Kocoro-lab/Shannon](https://github.com/Kocoro-lab/Shannon) | 多智能体框架，支撑三模型架构和 AGENT_TIER 路由 |
 | **Scientific Agent Skills** | [github.com/K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) | 147 个开源科研技能，为学术研究工作流提供参考 |
 | **ARIS** | [github.com/wanshuiyin/Auto-claude-code-research-in-sleep](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep) | 多智能体自动化科研系统 — 语言切换、项目结构、工作流设计参考 |
+| **K-Dense BYOK** | [github.com/K-Dense-AI/k-dense-byok](https://github.com/K-Dense-AI/k-dense-byok) | 开源科研助手 — 启发了 Fusion 投票、CostLedger snapshotMax、Interview 澄清和 21 专家智能体模型 |
 
 ---
 
