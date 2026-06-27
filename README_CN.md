@@ -206,6 +206,7 @@ PolyAgent-Research/
 | **Kocoro** | [github.com/Kocoro-lab/Kocoro](https://github.com/Kocoro-lab/Kocoro) | 智能体引擎，启发了 Phase 0–5 编排模式 |
 | **Shannon** | [github.com/Kocoro-lab/Shannon](https://github.com/Kocoro-lab/Shannon) | 多智能体框架，支撑三模型架构和 AGENT_TIER 路由 |
 | **Scientific Agent Skills** | [github.com/K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) | 147 个开源科研技能，为学术研究工作流提供参考 |
+| **ARIS** | [github.com/wanshuiyin/Auto-claude-code-research-in-sleep](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep) | 多智能体自动化科研系统 — 语言切换、项目结构、工作流设计参考 |
 
 ---
 

@@ -207,6 +207,7 @@ PolyAgent-Research/
 | **Kocoro** | [github.com/Kocoro-lab/Kocoro](https://github.com/Kocoro-lab/Kocoro) | Agent engine & daemon that inspired the Phase 0–5 orchestration pattern |
 | **Shannon** | [github.com/Kocoro-lab/Shannon](https://github.com/Kocoro-lab/Shannon) | Multi-agent framework powering the three-model architecture and AGENT_TIER routing |
 | **Scientific Agent Skills** | [github.com/K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) | 147 open-source scientific skills referenced for academic research workflows |
+| **ARIS** | [github.com/wanshuiyin/Auto-claude-code-research-in-sleep](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep) | Multi-agent autonomous research system — language switch pattern, project structure, and workflow design reference |
 
 ---
 
