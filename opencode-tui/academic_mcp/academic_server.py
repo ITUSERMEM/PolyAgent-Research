@@ -1,12 +1,12 @@
-"""Academic Pipeline MCP Server — 暴露复杂 agent 为 MCP tool。
+"""Academic Pipeline MCP Server — exposes complex agents as MCP tools.
 
-注册到 opencode 后可直接在聊天中使用：
-  - research-director:  管线编排与决策
-  - experimenter:       实验配置与执行
-  - scientific-computing-engineer:  GPU/计算管理
-  - paper-writer:       论文起草
-  - method-reviewer:    方法论评审
-  - academic-reviewer:  完整学术评审
+Once registered with opencode, these tools can be used directly in chat:
+  - research-director:  pipeline orchestration and decision-making
+  - experimenter:       experiment configuration and execution
+  - scientific-computing-engineer:  GPU/compute management
+  - paper-writer:       paper drafting
+  - method-reviewer:    methodology review
+  - academic-reviewer:  comprehensive academic review
 """
 
 import json
@@ -27,20 +27,20 @@ def _ts() -> str:
 TOOLS = [
     Tool(
         name="research-director",
-        description="管线编排与决策。启动/停止/跳过 Phase，分配 agent，查看整体状态",
+        description="Pipeline orchestration and decision-making. Start/stop/skip phases, assign agents, view overall status",
         inputSchema={
             "type": "object",
             "properties": {
                 "action": {
                     "type": "string",
                     "enum": ["start", "status", "skip", "stop"],
-                    "description": "操作类型",
+                    "description": "Action type",
                 },
                 "phase": {
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 5,
-                    "description": "目标 Phase",
+                    "description": "Target phase",
                 },
             },
             "required": ["action"],
@@ -48,30 +48,30 @@ TOOLS = [
     ),
     Tool(
         name="experimenter",
-        description="实验配置与执行。设计实验方案、运行训练、监控指标",
+        description="Experiment configuration and execution. Design experiments, run training, monitor metrics",
         inputSchema={
             "type": "object",
             "properties": {
                 "action": {
                     "type": "string",
                     "enum": ["design", "run", "monitor", "report"],
-                    "description": "实验操作",
+                    "description": "Experiment action",
                 },
-                "experiment_id": {"type": "string", "description": "实验 ID"},
+                "experiment_id": {"type": "string", "description": "Experiment ID"},
             },
             "required": ["action"],
         },
     ),
     Tool(
         name="scientific-computing-engineer",
-        description="HPC/GPU 计算管理。管理 GPU 资源、优化计算管线、数值稳定性",
+        description="HPC/GPU compute management. Manage GPU resources, optimize compute pipelines, numerical stability",
         inputSchema={
             "type": "object",
             "properties": {
                 "action": {
                     "type": "string",
                     "enum": ["check_gpu", "optimize", "profile", "fix_numerical"],
-                    "description": "计算操作",
+                    "description": "Compute action",
                 },
             },
             "required": ["action"],
@@ -79,30 +79,30 @@ TOOLS = [
     ),
     Tool(
         name="paper-writer",
-        description="论文起草。根据实验报告生成完整的学术论文各章节",
+        description="Paper drafting. Generate full academic paper sections from experiment reports",
         inputSchema={
             "type": "object",
             "properties": {
                 "section": {
                     "type": "string",
                     "enum": ["abstract", "intro", "method", "experiments", "conclusion", "full"],
-                    "description": "要撰写的章节",
+                    "description": "Section to write",
                 },
-                "venue": {"type": "string", "description": "目标会议/期刊"},
+                "venue": {"type": "string", "description": "Target venue"},
             },
             "required": ["section"],
         },
     ),
     Tool(
         name="method-reviewer",
-        description="方法论评审。审查方法设计的技术正确性和创新性",
+        description="Methodology review. Evaluate technical correctness and innovation of method design",
         inputSchema={
             "type": "object",
             "properties": {
                 "action": {
                     "type": "string",
                     "enum": ["review_method", "check_novelty", "check_reproducibility"],
-                    "description": "评审操作",
+                    "description": "Review action",
                 },
             },
             "required": ["action"],
@@ -110,14 +110,14 @@ TOOLS = [
     ),
     Tool(
         name="academic-reviewer",
-        description="完整学术评审。模拟 Nature 级审稿人三维度评审",
+        description="Comprehensive academic review. Simulates Nature-level reviewer assessment across multiple dimensions",
         inputSchema={
             "type": "object",
             "properties": {
                 "review_type": {
                     "type": "string",
                     "enum": ["full", "novelty", "experiments", "writing"],
-                    "description": "评审维度",
+                    "description": "Review dimension",
                 },
             },
             "required": ["review_type"],

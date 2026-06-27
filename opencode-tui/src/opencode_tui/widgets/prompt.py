@@ -1,10 +1,10 @@
-"""PromptInput — 底部输入栏。
+"""PromptInput — bottom input bar.
 
-opencode 风格：
-- ┃ 左边框（灰色 #484848，agent 激活时渐变到 agent 色）
-- backgroundElement (#1e1e1e) 统一底色
-- textarea + meta 行在同一个带边框容器内
-- 底部状态栏（无边框）：spinner / agent·model·provider / 快捷键提示
+opencode style:
+- ┃ left border (gray #484848, gradients to agent color when active)
+- backgroundElement (#1e1e1e) uniform base
+- textarea + meta row inside a bordered container
+- bottom status bar (borderless): spinner / agent·model·provider / shortcut hints
 """
 
 from textual.widgets import TextArea, Static
@@ -29,17 +29,17 @@ _OPENCODE_TEXTAREA_THEME = TextAreaTheme(
 
 
 COMMANDS = {
-    "/help":   "显示命令列表",
-    "/clear":  "清空聊天",
-    "/mode":   "切换后端 (redis/opencode)",
-    "/status": "查看管线状态",
-    "/connect": "重新连接后端",
-    "/diag":   "诊断信息",
+    "/help":   "Show command list",
+    "/clear":  "Clear chat",
+    "/mode":   "Switch backend (redis/opencode)",
+    "/status": "View pipeline status",
+    "/connect": "Reconnect backend",
+    "/diag":   "Diagnostic info",
 }
 
 
 class PromptInput(Vertical):
-    """底部输入栏。"""
+    """Bottom input bar."""
 
     _busy = reactive(False)
 
@@ -86,7 +86,7 @@ class PromptInput(Vertical):
     def _update_hint(self):
         hint = self.query_one("#input-hint", Static)
         if self._busy:
-            hint.update(f"[dim {TEXT_MUTED}]⠋ 推理中...[/]")
+            hint.update(f"[dim {TEXT_MUTED}]⠋ Thinking...[/]")
         else:
             hint.update(
                 f"[{TEXT_MUTED}]{self._agent}[/]"
@@ -100,11 +100,11 @@ class PromptInput(Vertical):
         st = self.query_one("#input-status", Static)
         if busy:
             st.update(
-                f"[dim {TEXT_MUTED}]⠋ 推理中   esc 中断[/]"
+                f"[dim {TEXT_MUTED}]⠋ Thinking   esc to abort[/]"
             )
         else:
             st.update(
-                f"[dim {TEXT_MUTED}]/help 查看命令[/]"
+                f"[dim {TEXT_MUTED}]/help for commands[/]"
             )
 
     def set_busy(self, busy: bool):

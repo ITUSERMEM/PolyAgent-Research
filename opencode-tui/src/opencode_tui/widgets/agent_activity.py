@@ -1,7 +1,7 @@
-"""AgentActivity — 实时事件流日志。
+"""AgentActivity — real-time event stream log.
 
-所有 agent/gate/budget 事件按时间顺序追加。
-颜色按 agent tier 区分（executor/reviewer/pro）。
+All agent/gate/budget events appended in chronological order.
+Colors distinguished by agent tier (executor/reviewer/pro).
 """
 
 from textual.widgets import RichLog
@@ -22,7 +22,7 @@ MAX_LINES = 100
 
 
 class AgentActivity(RichLog):
-    """实时事件流。"""
+    """Real-time event stream."""
 
     def __init__(self, **kwargs):
         super().__init__(

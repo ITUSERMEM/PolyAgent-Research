@@ -1,8 +1,8 @@
-"""opencode HTTP API 后端实现。
+"""OpenCode HTTP API backend implementation.
 
-将 opencode serve 的 SSE 事件流映射为 Backend 接口。
-事件转换为与 Redis 后端兼容的 dict 格式，
-App 层无需关心事件来源。
+Maps opencode serve's SSE event stream to the Backend interface.
+Events are converted to a dict format compatible with the Redis backend —
+the App layer does not need to know the event source.
 """
 
 import os
@@ -21,7 +21,7 @@ SESSION_STATUS_MAP = {
 
 
 class OpenCodeBackend(Backend):
-    """opencode HTTP API 后端。"""
+    """OpenCode HTTP API backend."""
 
     def __init__(
         self,
@@ -76,14 +76,7 @@ class OpenCodeBackend(Backend):
             if mapped:
                 yield mapped
 
-    def _map_event(self, event_type: str, props: dict) -> Optional[dict]:
-        """将 opencode SSE 事件映射为 Backend 通用格式。"""
-        source = {
-            "_source": "opencode",
-            "_session_id": self._session["id"] if self._session else "",
-        }
-
-        # ── 消息事件 ─────────────────────────────────
+        # -- Message events --
         if event_type == "message.updated":
             info = props.get("info", {})
             role = info.get("role", "")
@@ -98,7 +91,7 @@ class OpenCodeBackend(Backend):
                     **source,
                 }
 
-        # ── Part 更新（流式文本/工具/推理）───────────
+        # -- Part updates (streaming text / tools / reasoning) --
         elif event_type == "message.part.updated":
             part = props.get("part", {})
             pt = part.get("type", "")
@@ -139,7 +132,7 @@ class OpenCodeBackend(Backend):
                 reason = part.get("reason", "")
                 return {"type": "step_finish", "reason": reason, **source}
 
-        # ── Session 状态 ─────────────────────────────
+        # -- Session status --
         elif event_type == "session.status":
             st = props.get("status", {})
             if isinstance(st, dict):
@@ -150,7 +143,7 @@ class OpenCodeBackend(Backend):
                     **source,
                 }
 
-        # ── Session 错误 ─────────────────────────────
+        # -- Session error --
         elif event_type == "session.error":
             err = props.get("error", {})
             return {
@@ -159,7 +152,7 @@ class OpenCodeBackend(Backend):
                 **source,
             }
 
-        # ── 权限 ─────────────────────────────────────
+        # -- Permission --
         elif event_type == "permission.asked":
             return {
                 "type": "permission_asked",
@@ -168,16 +161,16 @@ class OpenCodeBackend(Backend):
                 **source,
             }
 
-        # ── server.connected / heartbeat ─────────────
+        # -- server.connected / heartbeat --
         elif event_type in ("server.connected", "server.heartbeat"):
             return {"type": "server_event", "event": event_type, **source}
 
         return None
 
-    # ── Pull-based APIs ──────────────────────────────
+    # -- Pull-based APIs --
 
     async def get_phase_state(self) -> dict:
-        """opencode 模式下无 phase 概念，返回空状态。"""
+        """No phase concept in opencode mode, return empty state."""
         return {"status": "idle", "current_phase": 0, "completed_phases": []}
 
     async def get_cost_summary(self) -> dict:

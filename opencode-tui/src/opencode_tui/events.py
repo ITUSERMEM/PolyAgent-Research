@@ -1,7 +1,7 @@
-"""事件类型 — 后端无关的抽象事件。
+"""Event types — backend-agnostic abstract events.
 
-TUI widget 只消费这些 Textual Message，
-不关心事件来自 Redis pub/sub 还是 opencode SSE。
+TUI widgets only consume these Textual Messages,
+regardless of whether events originate from Redis pub/sub or opencode SSE.
 """
 
 from dataclasses import dataclass, field

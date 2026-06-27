@@ -1,4 +1,4 @@
-"""opencode-tui widgets 包。"""
+"""opencode-tui widgets package."""
 
 from opencode_tui.widgets.spinner import Spinner
 from opencode_tui.widgets.message import (

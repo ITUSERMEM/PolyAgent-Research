@@ -1,7 +1,7 @@
-"""GateStatus — 7 门评审状态网格。
+"""GateStatus — 7-gate review status grid.
 
-每个 gate 显示 verdict (PASS/REVISE/FAIL) 或 pending。
-Fusion gates (G2/G5/G7) 标记 ⚡。
+Each gate displays verdict (PASS/REVISE/FAIL) or pending.
+Fusion gates (G2/G5/G7) marked with ⚡.
 """
 
 from textual.widgets import Static
@@ -26,13 +26,13 @@ VERDICT_LABELS = {
 }
 
 GATE_LABELS = {
-    1: "新颖性", 2: "实验设计", 3: "方法论",
-    4: "数据分析", 5: "逻辑一致性", 6: "可复现性", 7: "终审",
+    1: "Novelty", 2: "Exp. Design", 3: "Methodology",
+    4: "Data Analysis", 5: "Consistency", 6: "Reproducibility", 7: "Final Review",
 }
 
 
 class GateStatus(Static):
-    """Gate 评审状态面板。"""
+    """Gate review status panel."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

@@ -1,10 +1,10 @@
-"""CostBudget — 成本/预算仪表板。
+"""CostBudget — cost/budget dashboard.
 
-显示：
-- Session Budget 进度条
-- Task Budget 进度条
-- 累计 USD 成本
-- degrade/stop 告警
+Displays:
+- Session Budget progress bar
+- Task Budget progress bar
+- Cumulative USD cost
+- degrade/stop alerts
 """
 
 from textual.widgets import Static
@@ -22,7 +22,7 @@ BAR_CHARS = {
 
 
 class CostBudget(Static):
-    """成本/预算面板。"""
+    """Cost/budget panel."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

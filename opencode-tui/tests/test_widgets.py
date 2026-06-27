@@ -1,4 +1,4 @@
-"""Widget 单元测试。"""
+"""Widget unit tests."""
 
 import pytest
 from opencode_tui.theme import (
@@ -13,7 +13,7 @@ from opencode_tui.widgets.message import (
 
 
 class TestTheme:
-    """色板 token。"""
+    """Theme palette tokens."""
 
     def test_primary_hex(self):
         assert PRIMARY == "#fab283"
@@ -43,7 +43,7 @@ class TestTheme:
 
 
 class TestBars:
-    """┃ 左边框消息渲染。"""
+    """┃ Left-border message rendering."""
 
     def test_bar_message_returns_table(self):
         t = bar_message("hello")
@@ -80,7 +80,7 @@ class TestBars:
 
 
 class TestEvents:
-    """事件数据类。"""
+    """Event data classes."""
 
     def test_phase_event(self):
         from opencode_tui.events import PhaseEvent

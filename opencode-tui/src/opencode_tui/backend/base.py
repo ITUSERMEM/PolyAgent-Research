@@ -1,8 +1,8 @@
-"""抽象 Backend 接口。
+"""Abstract Backend interface.
 
-TUI 不直接消费 Redis pub/sub 或 opencode SSE。
-所有事件通过 `Backend` 接口的 `subscribe` 方法流式输出，
-由 App 层转发为 Textual Message。
+The TUI does not directly consume Redis pub/sub or opencode SSE.
+All events flow through the `Backend` interface's `subscribe` method,
+forwarded by the App layer as Textual Messages.
 """
 
 from abc import ABC, abstractmethod
@@ -10,7 +10,7 @@ from typing import AsyncIterator, Optional
 
 
 class Backend(ABC):
-    """Backend interface — TUI 切换后端不感知具体实现。"""
+    """Backend interface — TUI switches backends without knowing concrete implementation."""
 
     @property
     @abstractmethod
@@ -19,7 +19,7 @@ class Backend(ABC):
 
     @abstractmethod
     async def connect(self) -> bool:
-        """连接后端，返回是否成功。"""
+        """Connect to backend, return success status."""
         ...
 
     @abstractmethod
@@ -28,15 +28,15 @@ class Backend(ABC):
 
     @abstractmethod
     async def send_message(self, text: str) -> str:
-        """发送用户消息，返回消息 ID。"""
+        """Send user message, return message ID."""
         ...
 
     @abstractmethod
     async def subscribe(self) -> AsyncIterator[dict]:
-        """订阅事件流。每个 yield 返回一个事件 dict。
+        """Subscribe to event stream. Each yield returns an event dict.
 
-        ！！！！这是 TUI 的唯一数据源！！！！
-        App 层从这里读取事件 → 转换为 Textual Message → 更新 widget。
+        THIS IS THE TUI'S SINGLE DATA SOURCE.
+        The App layer reads events here → converts to Textual Message → updates widgets.
         """
         ...
 

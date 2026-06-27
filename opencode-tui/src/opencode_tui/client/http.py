@@ -1,7 +1,7 @@
-"""opencode HTTP API 客户端。
+"""OpenCode HTTP API client.
 
-封装 opencode serve 的所有 HTTP 端点调用。
-使用 httpx 异步 client，支持 Basic Auth + 目录路由。
+Encapsulates all opencode serve HTTP endpoint calls.
+Uses httpx async client, supports Basic Auth + directory routing.
 """
 
 import json
@@ -18,16 +18,16 @@ DEFAULT_USER = "opencode"
 
 
 class OpenCodeError(Exception):
-    """opencode API 错误。"""
+    """OpenCode API error."""
     def __init__(self, message: str, status_code: int = 0):
         self.status_code = status_code
         super().__init__(message)
 
 
 class OpenCodeClient:
-    """opencode HTTP API 客户端。
+    """OpenCode HTTP API client.
 
-    用法:
+    Usage:
         client = OpenCodeClient(password="my-pass")
         session = await client.create_session()
         async for event in client.subscribe():
@@ -58,15 +58,15 @@ class OpenCodeClient:
             qs += "&" + "&".join(f"{k}={v}" for k, v in params.items())
         return f"{self.base_url}{path}{qs}"
 
-    # ── Lifecycle ────────────────────────────────────
+    # -- Lifecycle --
 
     async def connect(self) -> bool:
-        """测试连接。"""
+        """Test connection."""
         try:
             self._http = httpx.AsyncClient(auth=self._get_auth())
             resp = await self._http.get(self._url("/global/health"))
             if resp.status_code == 401:
-                raise OpenCodeError("鉴权失败: OPENCODE_SERVER_PASSWORD 未正确设置", 401)
+                raise OpenCodeError("Auth failed: OPENCODE_SERVER_PASSWORD not set correctly", 401)
             data = resp.json()
             return data.get("healthy", False)
         except httpx.ConnectError:
@@ -81,7 +81,7 @@ class OpenCodeClient:
         assert self._http is not None, "client not connected, call connect() first"
         return self._http
 
-    # ── Session ──────────────────────────────────────
+    # -- Session --
 
     async def list_sessions(self) -> list[dict]:
         resp = await self.http.get(self._url("/session"))
@@ -99,7 +99,7 @@ class OpenCodeClient:
         model: str = "",
         title: str = "",
     ) -> dict:
-        """创建新 session。所有字段可选。"""
+        """Create new session. All fields optional."""
         body: dict = {}
         if agent:
             body["agent"] = agent
@@ -127,12 +127,12 @@ class OpenCodeClient:
         resp = await self.http.delete(self._url(f"/session/{session_id}"))
         self._raise_for_status(resp, "delete session")
 
-    # ── Prompt ───────────────────────────────────────
+    # -- Prompt --
 
     async def send_prompt(self, session_id: str, text: str, **kwargs) -> dict:
-        """发送 prompt，返回 assistant 消息记录。
+        """Send prompt, return assistant message record.
 
-        kwargs 可包含 agent, model 等。
+        kwargs may include agent, model, etc.
         """
         body = {
             "parts": [{"type": "text", "text": text}],
@@ -149,7 +149,7 @@ class OpenCodeClient:
         return resp.json()
 
     async def send_command(self, session_id: str, command: str, **kwargs) -> dict:
-        """发送 slash 命令。"""
+        """Send slash command."""
         body = {"command": command, "arguments": " ".join(kwargs.pop("args", []))}
         if kwargs.get("agent"):
             body["agent"] = kwargs["agent"]
@@ -160,17 +160,17 @@ class OpenCodeClient:
         self._raise_for_status(resp, "send command")
         return resp.json()
 
-    # ── Permission ───────────────────────────────────
+    # -- Permission --
 
     async def reply_permission(self, request_id: str, reply: str = "once"):
-        """回复权限请求。reply: once | always | reject"""
+        """Reply to permission request. reply: once | always | reject"""
         resp = await self.http.post(
             self._url(f"/permission/{request_id}/reply"),
             json={"reply": reply},
         )
         self._raise_for_status(resp, "reply permission")
 
-    # ── Agent / Provider / Config ────────────────────
+    # -- Agent / Provider / Config --
 
     async def list_agents(self) -> list[dict]:
         resp = await self.http.get(self._url("/agent"))
@@ -182,16 +182,16 @@ class OpenCodeClient:
         self._raise_for_status(resp, "list providers")
         return resp.json()
 
-    # ── Event Stream ─────────────────────────────────
+    # -- Event Stream --
 
     async def subscribe(
         self,
         session_id: Optional[str] = None,
     ) -> AsyncIterator[dict]:
-        """订阅 SSE 事件流。
+        """Subscribe to SSE event stream.
 
-        每次 yield 一个事件 dict: {id, type, properties}
-        如果指定 session_id，只 yield 该 session 的事件。
+        Each yield returns an event dict: {id, type, properties}
+        If session_id is specified, only yields events for that session.
         """
         async with self.http.stream(
             "GET",
@@ -214,7 +214,7 @@ class OpenCodeClient:
         session_id: str,
         timeout: float = 300.0,
     ) -> AsyncIterator[dict]:
-        """消费 SSE 流直到 session 状态变为 idle。"""
+        """Consume SSE stream until session status becomes idle."""
         import asyncio
         deadline = asyncio.get_event_loop().time() + timeout
         async for event in self.subscribe(session_id=session_id):
@@ -229,7 +229,7 @@ class OpenCodeClient:
             if event["type"] in ("session.error", "server.instance.disposed"):
                 break
 
-    # ── Helpers ──────────────────────────────────────
+    # -- Helpers --
 
     def _raise_for_status(self, resp, context: str):
         if resp.status_code >= 400:

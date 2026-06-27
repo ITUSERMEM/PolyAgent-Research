@@ -1,9 +1,9 @@
-"""PhaseRing — Phase 0-5 进度环。
+"""PhaseRing — Phase 0-5 progress ring.
 
-opencode 风格：
-- 6 个 phase，各显示状态图标 + 进度条 + 中文标签
-- 状态：pending · running · done · error
-- 颜色按 phase 索引区分
+opencode style:
+- 6 phases, each with status icon + progress bar + label
+- States: pending · running · done · error
+- Colors distinguished by phase index
 """
 
 from textual.widgets import Static
@@ -15,7 +15,7 @@ from opencode_tui.theme import (
 
 
 class PhaseRing(Static):
-    """Phase 0-5 进度。"""
+    """Phase 0-5 progress."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

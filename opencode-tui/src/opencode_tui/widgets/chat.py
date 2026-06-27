@@ -1,9 +1,9 @@
-"""ChatPanel — 流式消息渲染。
+"""ChatPanel — streaming message rendering.
 
-支持：
-- completed 消息：直接追加
-- streaming 消息：start → update → end 实时更新同一行
-- 工具块：独立 Static widget 可独立更新
+Supports:
+- completed messages: appended directly
+- streaming messages: start → update → end real-time update on same line
+- tool blocks: standalone Static widget for independent updates
 """
 
 from textual.app import ComposeResult
@@ -15,7 +15,7 @@ from opencode_tui.theme import TEXT_MUTED
 
 
 class ChatPanel(VerticalScroll):
-    """聊天面板 — 支持流式渲染的消息列表。"""
+    """Chat panel — streaming message list."""
 
     MAX_MESSAGES = 200
 
@@ -25,22 +25,22 @@ class ChatPanel(VerticalScroll):
         self._msg_count = 0
 
     def write(self, content: RenderableType):
-        """追加一条已完成消息。"""
+        """Append a completed message."""
         self._add_msg(Static(content, classes="message-block"))
 
     def start_stream(self, content: RenderableType = ""):
-        """开始一条流式消息。"""
+        """Start a streaming message."""
         self._stream_widget = Static(content, classes="message-block streaming")
         self._add_msg(self._stream_widget)
 
     def update_stream(self, content: RenderableType):
-        """更新当前流式消息。"""
+        """Update the current streaming message."""
         if self._stream_widget:
             self._stream_widget.update(content)
             self.scroll_end()
 
     def end_stream(self, content: RenderableType | None = None):
-        """结束流式消息（变为已完成消息）。"""
+        """End the streaming message (becomes a completed message)."""
         if self._stream_widget:
             if content is not None:
                 self._stream_widget.update(content)
@@ -49,9 +49,9 @@ class ChatPanel(VerticalScroll):
         self.scroll_end()
 
     def write_stream(self, text: str, finished: bool = False):
-        """便捷方法：追加一行流式文本。
+        """Convenience: append a line of streaming text.
 
-        当 finished=True 时结束流式，否则在该消息上追加。
+        When finished=True, ends the stream; otherwise appends to it.
         """
         content = f"[dim {TEXT_MUTED}]┃[/] {text}"
         if self._stream_widget is None:
@@ -62,7 +62,7 @@ class ChatPanel(VerticalScroll):
             self.update_stream(content)
 
     def tool_block(self, icon: str, title: str, output: str = "", status: str = "running"):
-        """渲染一个工具调用块。"""
+        """Render a tool call block."""
         icon_color = {"running": "#5c9cf5", "ok": "#7fd88f", "error": "#e06c75"}
         color = icon_color.get(status, "#808080")
         lines = [f"[dim {color}]┃[/] [{color}]{icon} {title}[/]"]
@@ -71,7 +71,7 @@ class ChatPanel(VerticalScroll):
         self.write("\n".join(lines))
 
     def write_bar(self, text: str, bar_color: str, text_color: str = "#eeeeee"):
-        """带 ┃ 左边框的单行消息。"""
+        """Single-line message with ┃ left border."""
         self.write(f"[bold {bar_color}]┃[/] [{text_color}]{text}[/]")
 
     def clear(self):

@@ -1,7 +1,7 @@
-"""Redis 后端实现。
+"""Redis backend implementation.
 
-将现有 dashbaord.py 的 Redis pub/sub + polling 逻辑迁移到此。
-与 opencode 后端共享相同的 Backend 接口。
+Migrates the existing dashboard.py Redis pub/sub + polling logic here.
+Shares the same Backend interface as the OpenCode backend.
 """
 
 import json
@@ -13,7 +13,7 @@ from opencode_tui.backend.base import Backend
 
 
 class RedisBackend(Backend):
-    """Redis 后端。"""
+    """Redis backend."""
 
     PROGRESS_CH = "academic:progress"
     OUTBOX_CH = "academic:outbox"

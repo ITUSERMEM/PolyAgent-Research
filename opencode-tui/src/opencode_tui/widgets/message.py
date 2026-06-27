@@ -1,11 +1,11 @@
-"""消息渲染 — opencode 风格的聊天气泡。
+"""Message rendering — opencode-style chat bubbles.
 
-每行以 ┃ 左边框开始，背景色按消息角色分层：
+Each line starts with ┃ left border, background layered by message role:
 - user: backgroundPanel + primary border
 - assistant: backgroundPanel + secondary border
 - system: backgroundPanel + muted border
 
-使用 Rich Table 实现零间距 ┃ + 内容布局。
+Uses Rich Table for zero-gap ┃ + content layout.
 """
 
 from datetime import datetime
@@ -29,7 +29,7 @@ def bar_message(
     bg: str = BG_PANEL,
     bold: bool = False,
 ) -> Table:
-    """生成带 ┃ 左边框的 Rich Table，零间距。"""
+    """Generate a Rich Table with ┃ left border, zero spacing."""
     table = Table.grid(padding=0)
     table.add_column(width=1)
     table.add_column(ratio=1)
@@ -53,7 +53,7 @@ def system_message(text: str, urgent: bool = False) -> Table:
 
 
 def tool_header(icon: str, title: str, *, color: str = SECONDARY) -> Table:
-    """工具调用块标题行。"""
+    """Tool call header line."""
     table = Table.grid(padding=0)
     table.add_column(width=1)
     table.add_column(ratio=1)
@@ -65,7 +65,7 @@ def tool_header(icon: str, title: str, *, color: str = SECONDARY) -> Table:
 
 
 def tool_output(text: str, *, color: str = TEXT_MUTED) -> Table:
-    """工具调用输出内容行。"""
+    """Tool call output content line."""
     table = Table.grid(padding=0)
     table.add_column(width=1)
     table.add_column(ratio=1)
@@ -77,7 +77,7 @@ def tool_output(text: str, *, color: str = TEXT_MUTED) -> Table:
 
 
 def message_footer(agent: str, model: str, duration: float) -> Table:
-    """消息底部脚注：▣ agent · model · duration"""
+    """Message footer: ▣ agent · model · duration"""
     dur = f"{duration:.1f}s" if duration else ""
     text = f"▣ {agent} · {model}"
     if dur:

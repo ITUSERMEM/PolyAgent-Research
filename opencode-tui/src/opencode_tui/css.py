@@ -1,9 +1,9 @@
-"""Textual CSS — opencode 视觉移植。
+"""Textual CSS — opencode visual port.
 
-关键设计：
-- 3 层背景层次：root(#0a0a0a) < panel(#141414) < element(#1e1e1e)
-- 签名元素：┃ 左边框（thick border via Rich Table）
-- 紧凑 padding，multiline 消息自动扩展
+Key design:
+- 3-layer background hierarchy: root(#0a0a0a) < panel(#141414) < element(#1e1e1e)
+- Signature element: ┃ left border (thick border via Rich Table)
+- Compact padding, multiline messages expand automatically
 """
 
 CSS = """
@@ -19,7 +19,7 @@ Screen {
     border: none;
 }
 
-/* ── Header / Footer ──────────────────────────── */
+/* -- Header / Footer -- */
 Header {
     background: #0a0a0a;
     color: #808080;
@@ -32,12 +32,12 @@ Footer {
     text-style: none;
 }
 
-/* ── Main Layout ──────────────────────────────── */
+/* -- Main Layout -- */
 #main-layout {
     height: 1fr;
 }
 
-/* ── Left Panel (Chat) ────────────────────────── */
+/* -- Left Panel (Chat) -- */
 #left-panel {
     width: 3fr;
     background: #0a0a0a;
@@ -61,7 +61,7 @@ ChatPanel > Static {
     background: #0a0a0a;
 }
 
-/* ── Prompt Input ─────────────────────────────── */
+/* -- Prompt Input -- */
 #input-area {
     height: auto;
     max-height: 15;
@@ -110,7 +110,7 @@ ChatPanel > Static {
     border: none;
 }
 
-/* ── Right Panel (Sidebar) ────────────────────── */
+/* -- Right Panel (Sidebar) -- */
 #right-panel {
     width: 2fr;
     background: #141414;
@@ -127,7 +127,7 @@ ChatPanel > Static {
     scrollbar-color-active: #606060;
 }
 
-/* ── Sidebar Widgets ──────────────────────────── */
+/* -- Sidebar Widgets -- */
 ProjectInfo {
     height: auto;
     background: #141414;
@@ -159,7 +159,7 @@ AgentActivity {
     padding: 0 2;
 }
 
-/* ── Mode Switcher ────────────────────────────── */
+/* -- Mode Switcher -- */
 #mode-bar {
     height: 1;
     background: #0a0a0a;
@@ -180,7 +180,7 @@ AgentActivity {
     color: #808080;
 }
 
-/* ── Chat Messages ────────────────────────────── */
+/* -- Chat Messages -- */
 .message-line {
     height: 1;
     padding: 0;
@@ -193,6 +193,4 @@ AgentActivity {
 """
 
 _DASHBOARD_CSS = CSS
-"""
-For compabitility with old imports.
-"""
+"""For compatibility with old imports."""

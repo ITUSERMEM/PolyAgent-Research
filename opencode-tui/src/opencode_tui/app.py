@@ -1,7 +1,7 @@
-"""opencode-tui 主应用。
+"""opencode-tui main application.
 
-融合 opencode 视觉风格 + 双后端（Redis / opencode API）。
-事件流由 Backend 抽象层屏蔽，App 层统一处理。
+Bridges opencode visual style with dual backend (Redis / opencode API).
+Event flow abstracted by Backend layer; App handles dispatch uniformly.
 """
 
 import argparse
@@ -29,24 +29,24 @@ from opencode_tui.widgets.agent_activity import AgentActivity
 from opencode_tui.widgets.sidebar import ProjectInfo
 
 COMMANDS = {
-    "/help":   "显示命令列表",
-    "/clear":  "清空聊天",
-    "/mode":   "切换后端 (redis/opencode)",
-    "/status": "查看管线状态",
-    "/connect": "重新连接后端",
-    "/diag":   "诊断信息",
+    "/help":   "Show command list",
+    "/clear":  "Clear chat",
+    "/mode":   "Switch backend (redis/opencode)",
+    "/status": "View pipeline status",
+    "/connect": "Reconnect backend",
+    "/diag":   "Diagnostic info",
 }
 
 
 class DashboardApp(App):
-    """opencode-tui 主应用。"""
+    """opencode-tui main application."""
 
     CSS = CSS
     TITLE = "opencode-tui"
     BINDINGS = [
-        Binding("q", "quit", "退出"),
-        Binding("escape", "focus_chat", "聊天", show=False),
-        Binding("ctrl+l", "clear_chat", "清屏", show=False),
+        Binding("q", "quit", "Quit"),
+        Binding("escape", "focus_chat", "Chat", show=False),
+        Binding("ctrl+l", "clear_chat", "Clear", show=False),
     ]
 
     def __init__(self, redis_url: str = "redis://localhost:6379", **kwargs):
@@ -80,7 +80,7 @@ class DashboardApp(App):
             await self._disconnect_backend()
 
         chat = self.query_one(ChatPanel)
-        chat.write(f"[dim {TEXT_MUTED}]┃ 正在连接 {self._mode} 后端...[/]")
+        chat.write(f"[dim {TEXT_MUTED}]┃ connecting to {self._mode} backend...[/]")
 
         if self._mode == "redis":
             self._backend = RedisBackend(redis_url=self.redis_url)
@@ -109,14 +109,14 @@ class DashboardApp(App):
         if ok:
             chat.write(
                 f"[dim {TEXT_MUTED}]┃ [{status_color}]✓[/]"
-                f" {self._mode} 后端已连接[/]"
+                f" {self._mode} backend connected[/]"
             )
             self._start_event_tasks()
             self._start_polling()
         else:
             chat.write(
                 f"[dim {TEXT_MUTED}]┃ [{status_color}]✗[/]"
-                f" {self._mode} 后端不可用，显示演示数据[/]"
+                f" {self._mode} backend unavailable, showing demo data[/]"
             )
             self._load_demo_data()
 
@@ -238,7 +238,7 @@ class DashboardApp(App):
 
         elif et == "reasoning_part":
             if event.get("finished"):
-                aa.append_event("推理完成", "pro")
+                aa.append_event("reasoning complete", "pro")
 
         elif et == "session_status":
             st = event.get("status", "")
@@ -250,11 +250,11 @@ class DashboardApp(App):
 
         elif et == "session_error":
             msg = event.get("message", "")
-            chat.write(system_message(f"✗ 管线错误: {msg}", urgent=True))
+            chat.write(system_message(f"✗ pipeline error: {msg}", urgent=True))
 
         elif et == "permission_asked":
             perm = event.get("permission", "")
-            chat.write(system_message(f"⚠ 权限请求: {perm}", urgent=True))
+            chat.write(system_message(f"⚠ permission requested: {perm}", urgent=True))
             if self._backend:
                 asyncio.create_task(
                     self._backend._client.reply_permission(
@@ -266,7 +266,7 @@ class DashboardApp(App):
             pass  # heartbeat, connected
 
     def _on_redis_event(self, event: dict):
-        """处理 Redis 格式的 progress 事件。"""
+        """Handle Redis-format progress events."""
         status = event.get("status", event.get("type", ""))
         detail = event.get("detail", "")
         phase = event.get("phase", -1)
@@ -279,8 +279,8 @@ class DashboardApp(App):
 
         if status == "pipeline_start":
             pr.reset_all()
-            chat.write(system_message("🚀 管线启动"))
-            aa.append_event("🚀 管线启动", "pro")
+            chat.write(system_message("🚀 Pipeline started"))
+            aa.append_event("🚀 Pipeline started", "pro")
             pi.set_status("running")
 
         elif status == "phase_start":
@@ -292,10 +292,10 @@ class DashboardApp(App):
 
         elif status == "phase_complete":
             pr.set_phase(phase, "done")
-            chat.write(system_message(f"✓ Phase {phase} 完成"))
+            chat.write(system_message(f"✓ Phase {phase} complete"))
 
         elif status == "pipeline_error":
-            chat.write(system_message(f"❌ 管线错误: {detail}", urgent=True))
+            chat.write(system_message(f"❌ pipeline error: {detail}", urgent=True))
             pi.set_status("error")
 
         elif status.startswith("agent_"):
@@ -307,7 +307,7 @@ class DashboardApp(App):
             elif status == "agent_skill_run":
                 chat.write(tool_header("⚙", agent))
             elif status == "agent_skill_ok":
-                chat.write(tool_output("✓ 完成"))
+                chat.write(tool_output("✓ done"))
 
         elif status.startswith("gate_"):
             gid = event.get("gate_id", 0)
@@ -340,15 +340,15 @@ class DashboardApp(App):
         gs.update_gate(2, "pass")
 
         aa = self.query_one(AgentActivity)
-        aa.append_event("环境初始化完成", "executor")
-        aa.append_event("文献调研: 检索 12 篇相关论文", "reviewer")
-        aa.append_event("方案设计进行中...", "pro")
-        aa.append_event("G1 新颖性  PASS", "reviewer")
-        aa.append_event("G2 实验设计  PASS (fusion)", "reviewer")
+        aa.append_event("Environment init done", "executor")
+        aa.append_event("Literature review: 12 papers found", "reviewer")
+        aa.append_event("Method design in progress...", "pro")
+        aa.append_event("G1 Novelty  PASS", "reviewer")
+        aa.append_event("G2 Exp. Design  PASS (fusion)", "reviewer")
 
         chat = self.query_one(ChatPanel)
         chat.clear()
-        chat.write("[dim #808080]opencode-tui v0.1.0 · 双后端 TUI[/]")
+        chat.write("[dim #808080]opencode-tui v0.1.0 · dual-backend TUI[/]")
         chat.write("")
 
     # ── Input Handling ──────────────────────────────
@@ -396,7 +396,7 @@ class DashboardApp(App):
         elif base == "/diag":
             asyncio.create_task(self._show_diag())
         else:
-            chat.write(f"[dim {TEXT_MUTED}]┃ 未知命令: {cmd}  [/][dim]使用 /help 查看列表[/]")
+            chat.write(f"[dim {TEXT_MUTED}]┃ unknown command: {cmd}  [/][dim]use /help for list[/]")
 
     def _switch_mode(self, mode: str):
         self._handle_command(f"/mode {mode}")
@@ -406,9 +406,9 @@ class DashboardApp(App):
         backend_name = self._backend.name if self._backend else "none"
         status = "connected" if self._connected else "disconnected"
         s_color = "#7fd88f" if self._connected else "#e06c75"
-        chat.write(f"[dim {TEXT_MUTED}]┃ opencode-tui 状态[/]")
-        chat.write(f"[dim {TEXT_MUTED}]┃   后端:   [/][{s_color}]◉ {backend_name} ({status})[/]")
-        chat.write(f"[dim {TEXT_MUTED}]┃   模式:   [/][#5c9cf5]{self._mode}[/]")
+        chat.write(f"[dim {TEXT_MUTED}]┃ opencode-tui status[/]")
+        chat.write(f"[dim {TEXT_MUTED}]┃   backend:  [/][{s_color}]◉ {backend_name} ({status})[/]")
+        chat.write(f"[dim {TEXT_MUTED}]┃   mode:     [/][#5c9cf5]{self._mode}[/]")
 
     def _send_via_backend(self, text: str):
         chat = self.query_one(ChatPanel)
@@ -422,7 +422,7 @@ class DashboardApp(App):
             await self._backend.send_message(text)
         except Exception as e:
             chat = self.query_one(ChatPanel)
-            chat.write(system_message(f"✗ 发送失败: {e}", urgent=True))
+            chat.write(system_message(f"✗ send failed: {e}", urgent=True))
         finally:
             try:
                 input_area = self.query_one(PromptInput)
@@ -457,7 +457,7 @@ class DashboardApp(App):
     def _local_echo(self, text: str):
         chat = self.query_one(ChatPanel)
         chat.write(user_message(text))
-        chat.write(assistant_message(f"已收到 (演示模式): {text}"))
+        chat.write(assistant_message(f"Received (demo mode): {text}"))
 
     # ── Focus Management ───────────────────────────
 

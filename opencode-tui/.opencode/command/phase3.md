@@ -1,6 +1,6 @@
 ---
 name: phase3
-description: Phase 3 - 实验验证
+description: Phase 3 - Experiment Validation
 model: deepseek-v4-pro
 ---
 

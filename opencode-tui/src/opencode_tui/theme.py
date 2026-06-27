@@ -1,35 +1,35 @@
-"""opencode 色板移植 — 40+ 颜色 token。
+"""opencode palette port — 40+ color tokens.
 
-从 opencode 默认主题 opencode.json 移植。
-所有颜色已在暗色模式下确认。
+Ported from opencode default theme opencode.json.
+All colors verified on dark background.
 """
 
 # ── Brand / Core ─────────────────────────────────────────
-PRIMARY = "#fab283"      # 暖桃 — 主强调色、prompt 边框、链接
-SECONDARY = "#5c9cf5"    # 蓝 — 文件附件、二级强调
-ACCENT = "#9d7cd8"       # 紫 — Markdown 标题、语法关键词
+PRIMARY = "#fab283"      # Warm peach — primary accent, prompt border, links
+SECONDARY = "#5c9cf5"    # Blue — file attachments, secondary accent
+ACCENT = "#9d7cd8"       # Purple — Markdown headings, syntax keywords
 
 # ── Status ───────────────────────────────────────────────
-ERROR = "#e06c75"        # 红 — 错误、拒绝权限
-WARNING = "#f5a742"      # 橙 — 警告、思考块、进行中
-SUCCESS = "#7fd88f"      # 绿 — 成功、MCP 连接
-INFO = "#56b6c2"         # 青 — 信息通知
+ERROR = "#e06c75"        # Red — errors, permission denied
+WARNING = "#f5a742"      # Orange — warnings, thinking blocks, in-progress
+SUCCESS = "#7fd88f"      # Green — success, MCP connected
+INFO = "#56b6c2"         # Cyan — informational notices
 
 # ── Text ─────────────────────────────────────────────────
-TEXT = "#eeeeee"         # 主要前景
-TEXT_MUTED = "#808080"   # 次要/静音文本、时间戳、提示
+TEXT = "#eeeeee"         # Primary foreground
+TEXT_MUTED = "#808080"   # Secondary/muted text, timestamps, hints
 
-# ── Background (3 层层次) ────────────────────────────────
-BG_ROOT = "#0a0a0a"       # 最底层画布
-BG_PANEL = "#141414"       # 内容块（消息、侧边栏）
-BG_ELEMENT = "#1e1e1e"     # 交互元素（输入框、悬停）
+# ── Background (3-layer hierarchy) ───────────────────────
+BG_ROOT = "#0a0a0a"       # Deepest canvas
+BG_PANEL = "#141414"       # Content blocks (messages, sidebar)
+BG_ELEMENT = "#1e1e1e"     # Interactive elements (input, hover)
 
-# ── Borders (5 阶灰度) ───────────────────────────────────
+# ── Borders (5-level gray) ────────────────────────────────
 BORDER = "#484848"
 BORDER_ACTIVE = "#606060"
 BORDER_SUBTLE = "#3c3c3c"
 
-# ── Diff 颜色 ────────────────────────────────────────────
+# ── Diff colors ───────────────────────────────────────────
 DIFF_ADDED = "#4fd6be"
 DIFF_REMOVED = "#c53b53"
 DIFF_CONTEXT = "#828bb8"
@@ -67,27 +67,27 @@ SYNTAX_PUNCTUATION = TEXT
 
 # ── Phase (P0-P5) ───────────────────────────────────────
 PHASE_COLORS = {
-    0: SECONDARY,      # 蓝 — 环境初始化
-    1: SECONDARY,      # 蓝 — 文献调研
-    2: ACCENT,         # 紫 — 方案设计
-    3: SUCCESS,        # 绿 — 实验验证
-    4: WARNING,        # 橙 — 代码实现
-    5: ERROR,          # 玫红 — 论文撰写
+    0: SECONDARY,      # Blue — Environment Init
+    1: SECONDARY,      # Blue — Literature Review
+    2: ACCENT,         # Purple — Method Design
+    3: SUCCESS,        # Green — Experiments
+    4: WARNING,        # Orange — Coding
+    5: ERROR,          # Rose — Paper Writing
 }
 
 PHASE_LABELS = {
-    0: "环境初始化",
-    1: "文献调研",
-    2: "方案设计",
-    3: "实验验证",
-    4: "代码实现",
-    5: "论文撰写",
+    0: "Environment Init",
+    1: "Literature Review",
+    2: "Method Design",
+    3: "Experiments",
+    4: "Coding",
+    5: "Paper Writing",
 }
 
 # ── Gate (G1-G7) ────────────────────────────────────────
 GATE_LABELS = {
-    1: "学术新颖性", 2: "实验设计", 3: "方法论",
-    4: "数据分析", 5: "逻辑一致性", 6: "可复现性", 7: "终审",
+    1: "Novelty", 2: "Exp. Design", 3: "Methodology",
+    4: "Data Analysis", 5: "Consistency", 6: "Reproducibility", 7: "Final Review",
 }
 FUSION_GATES = {2, 5, 7}
 

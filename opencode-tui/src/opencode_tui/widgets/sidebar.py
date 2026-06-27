@@ -1,13 +1,13 @@
-"""Sidebar — 右侧边栏容器。
+"""Sidebar — right sidebar container.
 
-包含：
+Contains:
 - ProjectInfo
 - PhaseRing
 - CostBudget
 - GateStatus
 - AgentActivity
 
-opencode 风格：backgroundPanel 底色，紧凑 spacing。
+opencode style: backgroundPanel base color, compact spacing.
 """
 
 from textual.containers import Vertical, VerticalScroll
@@ -22,7 +22,7 @@ from opencode_tui.widgets.agent_activity import AgentActivity
 
 
 class ProjectInfo(Static):
-    """项目信息面板。"""
+    """Project info panel."""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -52,7 +52,7 @@ class ProjectInfo(Static):
 
 
 class Sidebar(VerticalScroll):
-    """右侧边栏。"""
+    """Right sidebar."""
 
     def compose(self) -> ComposeResult:
         yield ProjectInfo(id="project-info")

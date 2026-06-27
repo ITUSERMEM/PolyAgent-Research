@@ -1,6 +1,6 @@
 ---
 name: phase5
-description: Phase 5 - 论文撰写
+description: Phase 5 - Paper Writing
 model: deepseek-v4-pro
 ---
 

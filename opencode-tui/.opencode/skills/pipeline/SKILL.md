@@ -1,18 +1,18 @@
 ---
 name: pipeline
-description: Academic Pipeline orchestration skill. Load this when running multi-phase research workflows: Phase 0 (环境初始化) → Phase 1 (文献调研) → Phase 2 (方案设计) → Phase 3 (实验验证) → Phase 4 (代码实现) → Phase 5 (论文撰写). Each phase uses a specialized agent from the academic team and runs through GateJudge review before transitioning.
+description: Academic Pipeline orchestration skill. Load this when running multi-phase research workflows: Phase 0 (Environment Setup) → Phase 1 (Literature Survey) → Phase 2 (Method Design) → Phase 3 (Experiment Validation) → Phase 4 (Code Implementation) → Phase 5 (Paper Writing). Each phase uses a specialized agent from the academic team and runs through GateJudge review before transitioning.
 ---
 
 # Academic Pipeline
 
 ## Phase Flow
 ```
-Phase 0: 环境初始化    → G1 学术新颖性
-Phase 1: 文献调研      → G2 实验设计 (fusion)
-Phase 2: 方案设计      → G3 方法论
-Phase 3: 实验验证      → G4 数据分析
-Phase 4: 代码实现      → G5 逻辑一致性 (fusion)
-Phase 5: 论文撰写      → G6 可复现性 → G7 终审 (fusion)
+Phase 0: Environment Setup    → G1 Academic Novelty
+Phase 1: Literature Survey    → G2 Experiment Design (fusion)
+Phase 2: Method Design        → G3 Methodology
+Phase 3: Experiment Validation → G4 Data Analysis
+Phase 4: Code Implementation  → G5 Logical Consistency (fusion)
+Phase 5: Paper Writing        → G6 Reproducibility → G7 Final Review (fusion)
 ```
 
 ## Quick Start

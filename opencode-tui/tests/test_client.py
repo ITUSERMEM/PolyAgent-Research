@@ -1,4 +1,4 @@
-"""Client 单元测试 — SSE 解析 + HTTP mock。"""
+"""Client unit tests — SSE parsing + HTTP mock."""
 
 import asyncio
 import json
@@ -8,7 +8,7 @@ from opencode_tui.client.sse import SSEClient, SSEEvent
 
 
 class TestSSEParser:
-    """SSE 流解析。"""
+    """SSE stream parsing."""
 
     def test_parse_single_event(self):
         block = (
@@ -104,7 +104,7 @@ class TestSSEParser:
 
 
 class TestSSEEvent:
-    """SSEEvent 数据类。"""
+    """SSEEvent data class."""
 
     def test_from_data(self):
         e = SSEEvent.from_data({

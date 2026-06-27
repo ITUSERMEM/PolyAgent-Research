@@ -1,6 +1,6 @@
-"""Braille spinner — opencode 原生动画。
+"""Braille spinner — opencode native animation.
 
-帧序列：⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏  @  80ms
+Frame sequence: ⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏  @  80ms
 """
 
 from textual.widgets import Static

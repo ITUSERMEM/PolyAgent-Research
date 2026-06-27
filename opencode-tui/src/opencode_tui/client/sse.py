@@ -1,11 +1,10 @@
-"""SSE (Server-Sent Events) 流解析。
+"""SSE (Server-Sent Events) stream parser.
 
-opencode 使用 SSE 推送实时事件：
+opencode uses SSE to push real-time events:
   event: message
   data: {"id":"evt_...","type":"event_type","properties":{...}}
-  
 
-每个 message 按空行分隔。
+Each message is delimited by a blank line.
 """
 
 import json
@@ -29,11 +28,11 @@ class SSEEvent:
 
 
 class SSEClient:
-    """SSE 流解析器。"""
+    """SSE stream parser."""
 
     @staticmethod
     async def iter_events(response) -> AsyncIterator[SSEEvent]:
-        """从 httpx 流响应中迭代 SSE 事件。"""
+        """Iterate SSE events from an httpx stream response."""
         buffer = ""
         async for chunk in response.aiter_text():
             buffer += chunk

@@ -1,6 +1,6 @@
 ---
 name: phase4
-description: Phase 4 - 代码实现
+description: Phase 4 - Code Implementation
 model: deepseek-v4-flash
 ---
 

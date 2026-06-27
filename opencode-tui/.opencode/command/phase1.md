@@ -1,6 +1,6 @@
 ---
 name: phase1
-description: Phase 1 - 文献调研
+description: Phase 1 - Literature Survey
 model: deepseek-v4-pro
 ---
 

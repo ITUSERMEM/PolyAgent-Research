@@ -1,6 +1,6 @@
 ---
 name: phase2
-description: Phase 2 - 方案设计
+description: Phase 2 - Method Design
 model: deepseek-v4-pro
 ---
 

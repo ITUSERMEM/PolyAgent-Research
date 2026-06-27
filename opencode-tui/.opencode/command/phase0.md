@@ -1,6 +1,6 @@
 ---
 name: phase0
-description: Phase 0 - 环境初始化
+description: Phase 0 - Environment Setup
 model: deepseek-v4-flash
 ---
 
