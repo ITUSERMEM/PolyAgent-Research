@@ -1,207 +1,200 @@
-# Academic Team — Multi-Agent Autonomous Research System
+# PolyAgent-Research
 
-A Kocoro-inspired multi-agent system for autonomous academic research.
-Orchestrates 12 AI agents through a Phase 0-5 research pipeline with
-LLM-powered review gates, persistent memory, and self-improvement mechanisms.
+> 多智能体自动化科研管线 — 12 个 AI 智能体协同完成从文献调研到论文投稿的全流程。
 
-## Three-Model Architecture
+![Python 3.12](https://img.shields.io/badge/Python-3.12+-3776AB)
+![Tests](https://img.shields.io/badge/Tests-224_passing-success)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Agents](https://img.shields.io/badge/Agents-12-blueviolet)
+![Pipeline](https://img.shields.io/badge/Pipeline-Phase_0–5-ff6b6b)
 
-| Role | Model | API Endpoint | Used For |
-|------|-------|-------------|----------|
-| **Executor** | deepseek-v4-flash | opencode.ai Zen | Agent iteration, writing, tools |
-| **Reviewer** | glm-5.2 | Volcengine ark | Gate evaluation, summarization |
-| **Pro** | deepseek-v4-pro | api.deepseek.com | Deep audit, proof check, citation |
+---
 
-## System Architecture
+## ✨ 亮点
 
-```
-Telegram ──→ Bridge ──→ Redis Pub/Sub ──→ AcademicLoop Daemon
-                                                │
-                                    ┌───────────┴───────────┐
-                                    │  _run_pipeline()      │
-                                    │  Phase 0 → 5          │
-                                    │    Agent → skill→ LLM │
-                                    │    Gate → pass/revise  │
-                                    └───────────┬───────────┘
-                                                │
-                     progress ────→ Telegram ←──┘
-                     result   ────→ Telegram
-```
+- **🧠 12 个领域智能体** — 研究总监、文献研究员、方法评审、论文写手等角色各司其职
+- **🔄 Phase 0–5 全自动管线** — 环境初始化 → 文献调研 → 方案设计 → 实验验证 → 代码实现 → 论文撰写
+- **🔍 7 道 LLM 评审门禁** — 新颖性、方法论、实验审计、引用审计，每个阶段自动质检
+- **🎯 三模型路由** — AGENT\_TIER 根据 skill 类型自动分配 Executor/Reviewer/Pro 模型，不是用一个 flash 干所有活
+- **🛡️ SkillContract 运行时保护** — 灰度发布 + 阻断模式，防止非法输入进入管线
+- **📡 Telegram 远程操控** — 随时随地启动管线、查看进度、接收结果
+- **🏭 Systemd 生产部署** — 4 个 systemd 服务，开机自启，自动恢复
 
-## 12 Agents
+---
 
-| Layer | Agent | Skills |
-|-------|-------|--------|
-| **Director** | research-director | pipeline orchestration, decisions |
-| | academic-editor | paper compilation, rebuttal |
-| **Research** | literature-researcher | paper search, review writing |
-| | methodologist | idea generation, experiment design |
-| | experimenter | GPU experiments, result analysis |
-| | scientific-computing-engineer | ML implementation, data processing |
-| | code-engineer | TDD, automation, CI/CD |
-| | paper-writer | LaTeX drafting, citation management |
-| | visualization-designer | figures, slides, diagrams |
-| **Review** | method-reviewer | proof checking, adversarial review |
-| | academic-reviewer | experiment audit, claim verification |
-| | citation-auditor | BibTeX verification, context check |
-
-## Phase 0-5 Pipeline
+## 🏗️ 架构概览
 
 ```
-Phase 0 ─→ Phase 1 ─→ Phase 2 ─→ Phase 3 ─→ Phase 4 ─→ Phase 5
-  Init      Literature   Method     Experiment  Coding     Paper
-  Setup     Review       Design     Validation  Writing    Writing
-              │             │           │          │          │
-           Gate 1       Gate 2       Gate 3    Gates 4-7   Submit
-         Novelty      Method       Experiment  Claim +     v
-         Check        Adversarial  Audit       Citation
+Telegram ──→ Telegram Bridge ──→ Redis Pub/Sub ──→ AcademicLoop Daemon
+                                                       │
+                                           ┌───────────┴───────────┐
+                                           │   Phase 0 → 1 → 2    │
+                                           │   → 3 → 4 → 5        │
+                                           │    12 Agents          │
+                                           │    7 Review Gates     │
+                                           └───────────┬───────────┘
+                                                       │
+                                    progress/result ────┘
+                                             ↓
+                                        Telegram
 ```
 
-## Quick Start
+**核心流程**：用户通过 Telegram 发送研究主题 → AcademicLoop 启动 Phase 0–5 管线 → 每个阶段 Agent 调用 Skill 执行任务 → 阶段结束后 Gate Judge 评审 → 通过进入下一阶段。
 
-### Prerequisites
+---
 
-- Docker (for Redis Stack)
+## ⚡ 快速开始
+
+### 前置要求
+
+- Docker（Redis Stack）
 - Python 3.12+
-- API keys for three LLM endpoints
+- 3 组 LLM API Key（Zen / Ark / DeepSeek）
 
-### Installation
+### 安装与运行
 
 ```bash
-# 1. Start Redis Stack
+# 1. 启动 Redis Stack
 docker run -d --name redis-stack -p 6379:6379 \
-  -v /data/redis-stack:/var/lib/redis-stack \
-  --restart=unless-stopped \
-  redis/redis-stack-server:latest \
-  redis-stack-server --appendonly yes
+  -v /data/redis-stack:/data \
+  redis/redis-stack-server --appendonly yes
 
-# 2. Install dependencies
+# 2. 安装依赖
 pip install -r redis-memory/requirements.txt
 pip install -r telegram_bridge/requirements.txt
 
-# 3. Set environment variables
-export ZEN_API_KEY="your-zen-api-key"
-export ARK_API_KEY="your-volcengine-ark-token"
-export DEEPSEEK_API_KEY="your-deepseek-api-key"
-export TELEGRAM_BOT_TOKEN="your-telegram-bot-token"
+# 3. 配置环境变量
+export ZEN_API_KEY="your-key"       # Executor: deepseek-v4-flash
+export ARK_API_KEY="your-key"       # Reviewer: glm-5.2
+export DEEPSEEK_API_KEY="your-key"  # Pro: deepseek-v4-pro
+export TELEGRAM_BOT_TOKEN="your-token"
 
-# 4. Run pipeline
-python3 -c "
-from academic_loop import AcademicLoop, Phase
-loop = AcademicLoop(project_title='My Research')
-loop.run(start_phase=Phase.PHASE0, end_phase=Phase.PHASE1)
-"
-
-# 5. Or start the team launcher (including Telegram bridge)
-python3 redis-memory/team_launcher.py --project "Research Topic"
+# 4. 启动（自动接管 Telegram，收到研究主题即启动管线）
+python3 redis-memory/team_launcher.py --project "My Research"
 ```
 
-### Run Tests
+### 运行测试
 
 ```bash
-cd redis-memory
-python3 -m pytest tests/ -v --tb=short
-# Expected: 128 passed, 0 failed
+cd redis-memory && pytest tests/ -v --tb=short
+# Expected: 224 passed, 0 failed
 ```
 
-## Systemd Deployment (Linux)
+---
+
+## 🧑‍🔬 12 个智能体
+
+| 层级 | 智能体 | 核心能力 |
+|------|--------|---------|
+| **指挥** | 研究项目总监 | 管线编排、决策调度 |
+| | 学术编辑 | 论文编译、Rebuttal |
+| **研究** | 文献研究员 | 论文检索、综述写作 |
+| | 方法论研究员 | Idea 生成、实验设计 |
+| | 实验工程师 | GPU 实验、结果分析 |
+| | 科学计算工程师 | ML 实现、数据处理 |
+| | 代码工程师 | TDD、自动化、CI/CD |
+| | 论文写手 | LaTeX 起草、引用管理 |
+| | 可视化设计师 | 图表、幻灯片、示意图 |
+| **评审** | 方法评审员 | 证明检查、对抗性评审 |
+| | 学术评审员 | 实验审计、Clam 验证 |
+| | 引用审计员 | BibTeX 验证、上下文检查 |
+
+每个智能体通过 AGENT\_TIER 自动分配到适合的 LLM 层级：简单检索 → Reviewer（glm-5.2），常规执行 → Executor（deepseek-v4-flash），复杂推理 → Pro（deepseek-v4-pro）。
+
+---
+
+## 🎯 三模型路由
+
+| 角色 | 模型 | 端点 | 负责任务 |
+|------|------|------|---------|
+| **Executor** | deepseek-v4-flash | opencode.ai Zen | 默认执行：实验、图表、代码 |
+| **Reviewer** | glm-5.2 | Volcengine Ark | 评审与检索：文献、门禁、润色 |
+| **Pro** | deepseek-v4-pro | api.deepseek.com | 复杂推理：论文写作、证明核验、引用审计 |
+
+路由表覆盖 30+ skill，训练/图表类 → Executor，文献检索 → Reviewer，论文/证明 → Pro。
+
+---
+
+## 🗺️ Phase 0–5 管线
+
+```
+Phase 0 ──→ Phase 1 ──→ Phase 2 ──→ Phase 3 ──→ Phase 4 ──→ Phase 5
+ Init       Literature   Method     Experiment  Coding      Paper
+ Setup      Review       Design     Validation  Writing     Submission
+               │             │           │         │
+            Gate 1       Gate 2       Gate 3    Gates 4+5   Gates 6+7
+          Novelty      Method       Experiment  Claim +     Final Review
+          Check        Adversarial  Audit       Citation    + Citation
+```
+
+---
+
+## 🛡️ SkillContract 安全层
+
+| 层 | 机制 | 说明 |
+|----|------|------|
+| **L1** | 输入验证 | Phase 兼容性、LaTeX 闭合、长度检查 |
+| **L2** | 熵监控 | 香农熵检测重复/退化输出 |
+| **L3** | 一致性投票 | 3 次独立调用，Reviewer 裁决分歧 |
+| **L4** | 根因分析 | Pro 模型差分分析失败 vs 成功日志 |
+
+支持灰度发布模式：先 `log_only=true` 观测 → 确认无误后开启阻断模式。
+
+---
+
+## 🏭 生产部署
 
 ```bash
-# Copy service files
-sudo cp systemd/*.service /etc/systemd/system/
-sudo systemctl daemon-reload
+# 复制 systemd 服务
+cp systemd/*.service /etc/systemd/system/ && systemctl daemon-reload
 
-# Enable and start
-sudo systemctl enable --now redis-stack
-sudo systemctl enable --now opencode-academic-team
-sudo systemctl enable --now opencode-telegram-bridge
+# 启动全部服务
+systemctl enable --now redis-stack
+systemctl enable --now opencode-academic-team
+systemctl enable --now opencode-telegram-bridge
 
-# Check status
+# 查看健康状态
 curl http://127.0.0.1:9333/health
 ```
 
-Edit `/etc/systemd/system/opencode-academic-team.service` to add your API keys:
-```
-Environment=ZEN_API_KEY=your-key
-Environment=ARK_API_KEY=your-key
-Environment=DEEPSEEK_API_KEY=your-key
-```
+---
 
-## Telegram Bot Setup
-
-1. Create a bot via [@BotFather](https://t.me/BotFather) on Telegram
-2. Set the token as `TELEGRAM_BOT_TOKEN` environment variable
-3. The bridge auto-connects when `team_launcher.py` is running
-
-The bridge supports two routing modes:
-- **AcademicLoop mode** (default when daemon is running)
-- **tmux fallback** (direct opencode interaction)
-
-Commands:
-- `/status` — View current pipeline status
-- `/stop` — Stop running pipeline
-- Send any research topic to start Phase 0-5 automatically
-
-## Project Structure
+## 📁 项目结构
 
 ```
-academic-team/
-├── redis-memory/           # Core modules (40+ files)
-│   ├── academic_loop.py    # Phase 0-5 orchestrator
-│   ├── llm_client.py       # DualLLM three-model client
-│   ├── gate_judge.py       # 7 LLM-powered review gates
-│   ├── loop_detector.py    # 9-path loop detection
-│   ├── persist_learnings.py # Kocoro memory pipeline
-│   ├── permissions.py      # 7-level permission system
-│   ├── hallucination_guard.py # 3-layer hallucination detection
-│   ├── team_launcher.py    # Unified startup
-│   ├── requirements.txt
-│   └── tests/              # 128 tests, 14 test files
-├── telegram_bridge/        # Telegram bot interface
-│   ├── telegram_bridge.py
-│   └── start_bridge.sh
-├── systemd/                # System service units
-│   ├── redis-stack.service
-│   ├── opencode-academic-team.service
-│   ├── opencode-telegram-bridge.service
-│   └── aris-watchdog.service
-├── skills/                 # OpenCode skills
-│   └── academic-dev-pitfalls/SKILL.md
-├── figures/
-│   └── ascii_architecture.txt
-├── README.md
-└── .gitignore
+PolyAgent-Research/
+├── redis-memory/         # 核心模块（50+ 文件）
+│   ├── academic_loop.py  # 管线编排器
+│   ├── llm_client.py     # 三模型客户端
+│   ├── gate_judge.py     # 7 门 LLM 评审
+│   ├── skill_contract.py # 运行时安全层
+│   ├── fault_catalog.py  # 27 故障模式
+│   └── tests/            # 224 项测试
+├── telegram_bridge/      # Telegram 桥接
+├── systemd/              # 4 个 Systemd 服务
+├── skills/               # 技能文件
+└── figures/              # 架构图与论文插图
 ```
 
-## Development Constraints
+---
 
-The project includes a skill file documenting 45 verified bug patterns
-encountered during development, organized into 6 categories:
-infrastructure, Telegram bridge, orchestrator, module coding, testing,
-and security. Load it via opencode's skill system before modifying code:
+## 📊 测试覆盖
 
-```
-/root/.config/opencode/skills/academic-dev-pitfalls/SKILL.md
-```
+| 模块 | 测试数 |
+|------|-------|
+| 管线编排 | 38 |
+| 循环检测 | 22 |
+| SkillContract | 38 |
+| 会话与调度 | 30 |
+| 权限与幻觉 | 27 |
+| 摘要与持久化 | 25 |
+| 工具预算与心跳 | 20 |
+| Fault/Adversarial | 12 |
+| LLM 集成（慢） | 11 |
+| **合计** | **224** |
 
-## Test Coverage
+---
 
-| Module | Tests |
-|--------|-------|
-| loop_detector | 22 |
-| hallucination_guard | 12 |
-| permissions | 15 |
-| phase_state_machine | 12 |
-| read_tracker | 6 |
-| tool_result_budget | 8 |
-| skill_executor | 8 |
-| summarizer | 8 |
-| persist_learnings | 10 |
-| session_cache | 8 |
-| scheduler | 8 |
-| heartbeat | 6 |
-| **Total** | **128** |
-
-## License
+## 📄 License
 
 MIT
