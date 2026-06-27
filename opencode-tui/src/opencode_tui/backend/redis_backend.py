@@ -85,7 +85,67 @@ class RedisBackend(Backend):
             return {"status": "idle", "current_phase": 0, "completed_phases": []}
 
     async def get_cost_summary(self) -> dict:
-        return {"session_cost": 0.0, "task_cost": 0.0, "total_cost": 0.0}
+        try:
+            state = await self._r.json().get(self.STATE_KEY) or {}
+            pid = state.get("project_id") or "default"
+
+            from redis import Redis as SyncRedis
+
+            def _read():
+                r = SyncRedis.from_url(self.redis_url, decode_responses=True)
+                try:
+                    # TokenBudget: read session usage directly
+                    session_key = f"budget:session:{pid}:total"
+                    s_tokens = int(r.hget(session_key, "tokens") or 0)
+                    s_calls = int(r.hget(session_key, "calls") or 0)
+                    SESSION_LIMIT = 128000
+                    session_pct = round(s_tokens / SESSION_LIMIT * 100, 1) if SESSION_LIMIT else 0
+
+                    # Task budget
+                    task_key = f"budget:task:{pid}:total"
+                    t_tokens = int(r.hget(task_key, "tokens") or 0)
+                    t_calls = int(r.hget(task_key, "calls") or 0)
+                    TASK_LIMIT = 512000
+                    task_pct = round(t_tokens / TASK_LIMIT * 100, 1) if TASK_LIMIT else 0
+
+                    # Cost: read project total
+                    total_cost = float(r.get(f"cost:{pid}:total") or 0.0)
+
+                    # Cost: read first session's detail
+                    session_ids = r.smembers(f"cost:{pid}:sessions") or set()
+                    agent_cost = 0.0
+                    if session_ids:
+                        sid = sorted(session_ids)[0]
+                        raw = r.lrange(f"costs:{pid}:{sid}", 0, -1)
+                        for entry in raw:
+                            import json as _j
+                            try:
+                                e = _j.loads(entry)
+                                agent_cost += float(e.get("cost_usd", 0.0))
+                            except Exception:
+                                pass
+
+                    return {
+                        "session_pct": int(session_pct),
+                        "task_pct": int(task_pct),
+                        "session_cost": agent_cost,
+                        "task_cost": total_cost,
+                        "total_cost": total_cost,
+                        "action": "ok",
+                    }
+                finally:
+                    try:
+                        r.close()
+                    except Exception:
+                        pass
+
+            import asyncio
+            return await asyncio.to_thread(_read)
+        except Exception:
+            return {
+                "session_pct": 0, "task_pct": 0,
+                "session_cost": 0.0, "task_cost": 0.0, "total_cost": 0.0,
+            }
 
     async def get_gate_results(self) -> dict:
         try:
