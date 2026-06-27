@@ -12,7 +12,7 @@ from textual.reactive import reactive
 from textual.containers import Vertical
 
 from opencode_tui.theme import (
-    PRIMARY, ACCENT, TEXT, TEXT_MUTED,
+    ACCENT, TEXT, TEXT_MUTED,
     BG_ROOT, BG_PANEL, BG_ELEMENT, BORDER,
 )
 
@@ -75,7 +75,7 @@ class PromptInput(Vertical):
             hint.update(f"[dim {TEXT_MUTED}]⠋ 推理中...[/]")
         else:
             hint.update(
-                f"[{PRIMARY}]{self._agent}[/]"
+                f"[{TEXT_MUTED}]{self._agent}[/]"
                 f" [dim {TEXT_MUTED}]·[/]"
                 f" [dim {TEXT_MUTED}]{self._model}[/]"
                 f" [dim {TEXT_MUTED}]· {self._provider}[/]"

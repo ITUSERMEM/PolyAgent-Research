@@ -57,15 +57,15 @@ ChatPanel > Static {
 #input-area {
     height: auto;
     max-height: 15;
-    background: #0a0a0a;
-    border: none;
+    background: #1e1e1e;
+    border-left: solid #484848;
     padding: 0;
 }
 
 #input-box {
     height: auto;
-    background: #1e1e1e;
-    border-left: solid #484848;
+    background: transparent;
+    border: none;
     padding: 0 0 1 0;
 }
 
@@ -73,7 +73,7 @@ ChatPanel > Static {
     height: auto;
     min-height: 1;
     max-height: 8;
-    background: #1e1e1e;
+    background: transparent;
     color: #eeeeee;
     border: none;
     padding: 1 1 0 1;
@@ -81,14 +81,14 @@ ChatPanel > Static {
 
 #input-hint {
     height: 1;
-    background: #1e1e1e;
+    background: transparent;
     color: #808080;
     padding: 0 1 0 1;
 }
 
 #input-status {
     height: 1;
-    background: #0a0a0a;
+    background: transparent;
     color: #808080;
     padding: 0 1;
 }
@@ -96,10 +96,10 @@ ChatPanel > Static {
 #cmd-suggest {
     height: auto;
     max-height: 8;
-    background: #141414;
+    background: transparent;
     color: #808080;
     padding: 1 1;
-    border-left: solid #484848;
+    border: none;
 }
 
 /* ── Right Panel (Sidebar) ────────────────────── */
