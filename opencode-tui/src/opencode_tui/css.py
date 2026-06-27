@@ -11,6 +11,14 @@ Screen {
     background: #0a0a0a;
 }
 
+*:focus {
+    border: none;
+}
+
+*:focus-within {
+    border: none;
+}
+
 /* ── Header / Footer ──────────────────────────── */
 Header {
     background: #0a0a0a;
@@ -77,14 +85,6 @@ ChatPanel > Static {
     color: #eeeeee;
     border: none;
     padding: 1 1 0 1;
-}
-
-#input-textarea:focus {
-    border: none;
-}
-
-TextArea:focus {
-    border: none;
 }
 
 #input-hint {
