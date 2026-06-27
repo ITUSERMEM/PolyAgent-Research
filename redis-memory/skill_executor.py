@@ -79,7 +79,8 @@ class SkillExecutor:
         """
         import shlex
         safe_args = shlex.quote(args[:300]) if args else ""
-        cmd = f"timeout {SKILL_TIMEOUT} opencode run /{skill_name} {safe_args}".strip()
+        cwd = os.getcwd()
+        cmd = f"timeout {SKILL_TIMEOUT} opencode run --dir {cwd} /{skill_name} {safe_args}".strip()
         start = time.time()
         all_lines = []
         proc = None
@@ -100,7 +101,7 @@ class SkillExecutor:
         try:
             proc = subprocess.Popen(
                 cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                text=True, bufsize=1,
+                text=True, bufsize=1, cwd=cwd,
             )
 
             def _consume_stderr():
